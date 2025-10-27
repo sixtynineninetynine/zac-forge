@@ -4,18 +4,18 @@ import com.zac.Config;
 
 import java.util.ArrayList;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.item.ItemEntity;
 
 @EventBusSubscriber
 public class CustomZombieDrops {
@@ -28,8 +28,7 @@ public class CustomZombieDrops {
     }
 
     @SubscribeEvent
-    @SuppressWarnings("deprecation")
-    public static void onEntityDeath(LivingDeathEvent event) {
+    public static void onEntityDeath(LivingDropsEvent event) {
         if (!Config.additionalZombieDrops.isEmpty()) {
             Entity entity = event.getEntity();
             if (entity != null && entity.level() instanceof ServerLevel world) {

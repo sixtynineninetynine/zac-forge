@@ -7,9 +7,9 @@ import com.zac.Config;
 import java.util.HashMap;
 import java.util.UUID;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -35,10 +35,9 @@ public class DayCounter {
     private static final HashMap<UUID, Integer> time = new HashMap<>();
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (Config.dayCounterEnabled) {
-            Player player = event.player;
-            if (event.phase == TickEvent.Phase.END && player != null) {
+            if (event.getEntity() instanceof Player player) {
                 LevelAccessor world = player.level();
                 if (!world.isClientSide() && world instanceof ServerLevel level) {
                     if (world.dayTime() % 24000 == 1) {
@@ -59,6 +58,7 @@ public class DayCounter {
                     }
                 }
             }
+
         }
     }
 }

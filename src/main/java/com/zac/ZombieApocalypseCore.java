@@ -1,54 +1,51 @@
 package com.zac;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.List;
-import java.util.Collection;
-import java.util.ArrayList;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import net.minecraftforge.fml.util.thread.SidedThreadGroups;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-//import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
-@Mod("zac")
+@Mod(ZombieApocalypseCore.MODID)
 public class ZombieApocalypseCore {
 
-	public static final Logger LOGGER = LogUtils.getLogger();
-	public static final String MODID = "zac";
+    public static final String MODID = "zac";
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-	public ZombieApocalypseCore(FMLJavaModLoadingContext context) {
-		MinecraftForge.EVENT_BUS.register(this);
-		// might need this someday, probably not though
-		// IEventBus modEventBus = context.getModEventBus();
-		context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-	}
+    private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
 
-	private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
+    public ZombieApocalypseCore(IEventBus modEventBus, ModContainer modContainer) {
+        NeoForge.EVENT_BUS.register(this);
 
-	public static void queueServerWork(int tick, Runnable action) {
-		if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER)
-			workQueue.add(new AbstractMap.SimpleEntry<>(action, tick));
-	}
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
 
-	@SubscribeEvent
-	public void tick(TickEvent.ServerTickEvent event) {
-		if (event.phase == TickEvent.Phase.END) {
-			List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
-			workQueue.forEach(work -> {
-				work.setValue(work.getValue() - 1);
-				if (work.getValue() == 0)
-					actions.add(work);
-			});
-			actions.forEach(e -> e.getKey().run());
-			workQueue.removeAll(actions);
-		}
-	}
+    public static void queueServerWork(int tickDelay, Runnable action) {
+        workQueue.add(new AbstractMap.SimpleEntry<>(action, tickDelay));
+    }
+
+    @SubscribeEvent
+    public void onServerTick(ServerTickEvent.Post event) {
+        List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
+        workQueue.forEach(work -> {
+            work.setValue(work.getValue() - 1);
+            if (work.getValue() <= 0) {
+                actions.add(work);
+            }
+        });
+
+        actions.forEach(entry -> entry.getKey().run());
+        workQueue.removeAll(actions);
+    }
 }

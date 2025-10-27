@@ -2,19 +2,18 @@ package com.zac.features;
 
 import com.zac.Config;
 
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
+
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 @EventBusSubscriber
 public class NoDaylightBurning {
 
 	@SubscribeEvent
-	@SuppressWarnings("deprecation")
-	public static void entityTickEvent(LivingEvent.LivingTickEvent event) {
+	public static void entityTickEvent(EntityTickEvent.Pre event) {
 		Entity entity = event.getEntity();
 		if (Config.daylightResistantEntities
 				.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())) {

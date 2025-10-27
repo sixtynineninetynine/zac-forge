@@ -2,9 +2,9 @@ package com.zac.features;
 
 import com.zac.Config;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.item.Items;
@@ -19,8 +19,8 @@ import net.minecraft.world.Difficulty;
 public class HeavilyArmorZombies {
 
     public static void armorEntity(Entity entity, EquipmentSlot slot, ItemStack item) {
-        if (entity instanceof LivingEntity living) {
-            living.setItemSlot(slot, item);
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.setItemSlot(slot, item);
         }
     }
 
@@ -75,7 +75,7 @@ public class HeavilyArmorZombies {
     }
 
     @SubscribeEvent
-    public static void onEntitySpawn(FinalizeSpawn event) {
+    public static void onEntitySpawn(FinalizeSpawnEvent event) {
         if (Config.heavilyArmoredZombiesEnabled) {
             LevelAccessor world = event.getLevel();
             Entity entity = event.getEntity();

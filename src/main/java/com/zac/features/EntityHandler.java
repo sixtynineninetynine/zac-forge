@@ -2,12 +2,12 @@ package com.zac.features;
 
 import com.zac.Config;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +17,6 @@ import net.minecraft.world.entity.Mob;
 public class EntityHandler {
 
     @SubscribeEvent
-    @SuppressWarnings("deprecation")
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         String entityRegistryName = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString();
